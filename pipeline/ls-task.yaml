@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: repo-viewer-pod
+spec:
+  containers:
+    - name: repo-viewer
+      image: busybox
+      command: ["sleep", "infinity"]  # Keep the container running indefinitely to inspect the contents.
+      volumeMounts:
+        - name: shared-data
+          mountPath: /repo  # Mount the workspace to /repo in the container.
+  volumes:
+    - name: shared-data
+      persistentVolumeClaim:
+        claimName: pvc-16a19317-09b7-4665-a1c0-5757a86e5873

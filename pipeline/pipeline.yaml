@@ -1,0 +1,78 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+ name: cicd-pipeline 
+spec:
+ params:
+   - name: repo-url
+     type: string
+     description: The git repository URL to clone from.
+
+   - name: branch-name
+     type: string
+     description: The git branch to clone.
+
+   - name: IMAGE
+     description: the name of the image.
+
+   - name: TLSVERIFY
+     description: to activate the tls handshake
+
+
+ workspaces:
+   - name: shared-data
+     description: |
+       This workspace will receive the cloned git repo
+
+ #  - name: dockerconfig-ws
+  #   optional: true
+   #  description: to access the dockerhub registory
+
+
+ tasks:
+   - name: fetch-repo
+     taskRef:
+       name: git-clone
+     workspaces:
+       - name: output
+         workspace: shared-data
+
+     params:
+       - name: url
+         value: $(params.repo-url)
+       - name: revision
+         value: $(params.branch-name)
+       - name: deleteExisting
+         value: "true"
+
+   - name: list-repo-contents
+     taskRef:
+        name: list-repo-contents
+     runAfter:
+        - fetch-repo
+     workspaces:
+      - name: source
+        workspace: shared-data
+
+
+   - name: build 
+     taskRef:
+       name: buildah
+     runAfter:
+       - fetch-repo
+     params:
+       - name: IMAGE
+         value: $(params.IMAGE)
+       - name: IMAGE_PUSH_SECRETS
+         value: dockerhub-secret
+       - name: TLSVERIFY
+         value: $(params.TLSVERIFY)
+
+
+     workspaces:
+       - name: source
+         workspace: shared-data
+
+     #  - name: dockerconfig
+     #    workspace: dockerconfig-ws
+
