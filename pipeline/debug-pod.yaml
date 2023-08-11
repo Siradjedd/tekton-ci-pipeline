@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-pod
+  namespace: cicd
+spec:
+  containers:
+    - name: simple-container
+      image: busybox
+      command: ["/bin/sh"]
+      stdin: true
+      tty: true
+      volumeMounts:
+        - name: shared-data
+          mountPath: /workspace/shared-data
+  volumes:
+    - name: shared-data
+      persistentVolumeClaim:
+        claimName: pvc-4862247464

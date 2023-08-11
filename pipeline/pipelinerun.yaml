@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+ name: git-clone-checking-out-a-branch
+spec:
+ pipelineRef:
+   name: cicd-pipeline 
+ workspaces:
+   - name: shared-data
+     volumeClaimTemplate:
+       spec:
+         accessModes:
+           - ReadWriteOnce
+         resources:
+           requests:
+             storage: 1Gi
+
+  # - name: dockerconfig-ws
+   #  secret:
+    #    secretName: dockerhub-secret
+ params:
+   - name: repo-url
+     value: https://github.com/Siradjedd/tekton-cicd-pipeline.git
+   - name: branch-name
+     value: main
+   - name: IMAGE
+     value: docker.io/siradjedd/test
+   - name: TLSVERIFY
+     value: "false"
+ serviceAccountName: pipeline-runner
+
+   
