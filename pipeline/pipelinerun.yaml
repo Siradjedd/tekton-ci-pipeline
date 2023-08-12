@@ -29,10 +29,7 @@ spec:
      value: "false"
    - name: SOURCE_PATH
      value: my-flask-app/tests/
-   - name: DOCKERFILE
-     value: /workspace/source/my-flask-app/Dockerfile
-   - name: CONTEXT
-     value: /workspace/source/my-flask-app/
+
  serviceAccountName: pipeline-runner
 
    

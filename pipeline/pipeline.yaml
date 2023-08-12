@@ -21,11 +21,7 @@ spec:
    - name: SOURCE_PATH
      description: tests path 
 
-   - name: DOCKERFILE
-     description: Path to the docker file
 
-   - name: CONTEXT
-     description:  Path to the directory to use as context 
 
  workspaces:
    - name: shared-data
@@ -64,7 +60,7 @@ spec:
 
      params:
        - name: SOURCE_PATH
-         value: "$(params.SOURCE_PATH)"
+         value: $(params.SOURCE_PATH)
 
 
    - name: list-repo-contents
@@ -90,9 +86,9 @@ spec:
        - name: TLSVERIFY
          value: $(params.TLSVERIFY)
        - name: DOCKERFILE
-         value: $(params.DOCKERFILE)
+         value: my-flask-app/Dockerfile  # Path to your Dockerfile
        - name: CONTEXT
-         value: $(params.CONTEXT)
+         value: my-flask-app  # Path to your context directory
 
 
      workspaces:
