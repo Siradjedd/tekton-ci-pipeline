@@ -1,100 +1,95 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
- name: cicd-pipeline 
+  name: cicd-pipeline
 spec:
- params:
-   - name: repo-url
-     type: string
-     description: The git repository URL to clone from.
-
-   - name: branch-name
-     type: string
-     description: The git branch to clone.
-
-   - name: IMAGE
-     description: the name of the image.
-
-   - name: TLSVERIFY
-     description: to activate the tls handshake
-
-   - name: SOURCE_PATH
-     description: tests path 
+  params:
+    - name: repo-url
+      type: string
+      description: The git repository URL to clone from.
+    - name: branch-name
+      type: string
+      description: The git branch to clone.
+    - name: IMAGE
+      description: The name of the image.
+    - name: TLSVERIFY
+      description: To activate the TLS handshake.
+    - name: SOURCE_PATH
+      description: Tests path.
 
 
 
- workspaces:
-   - name: shared-data
-     description: |
-       This workspace will receive the cloned git repo
-
- #  - name: dockerconfig-ws
-  #   optional: true
-   #  description: to access the dockerhub registory
+  workspaces:
+    - name: shared-data
+      description: This workspace will receive the cloned git repo
 
 
- tasks:
-   - name: fetch-repo
-     taskRef:
-       name: git-clone
-     workspaces:
-       - name: output
-         workspace: shared-data
 
-     params:
-       - name: url
-         value: $(params.repo-url)
-       - name: revision
-         value: $(params.branch-name)
-       - name: deleteExisting
-         value: "true"
-      
-   - name: tests
-     taskRef:
+
+  tasks:
+    - name: fetch-repo
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-data
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.branch-name)
+        - name: deleteExisting
+          value: "true"
+
+
+
+
+    - name: tests
+      taskRef:
         name: pytest
-     runAfter:
-       - fetch-repo
-     workspaces:
-       - name: source
-         workspace: shared-data
-
-     params:
-       - name: SOURCE_PATH
-         value: $(params.SOURCE_PATH)
-
-
-   - name: list-repo-contents
-     taskRef:
-        name: list-repo-contents
-     runAfter:
+      runAfter:
         - fetch-repo
-     workspaces:
-      - name: source
-        workspace: shared-data
+      workspaces:
+        - name: source
+          workspace: shared-data
+      params:
+        - name: SOURCE_PATH
+          value: $(params.SOURCE_PATH)
 
 
-   - name: build 
-     taskRef:
-       name: buildah
-     runAfter:
-       - tests
-     params:
-       - name: IMAGE
-         value: $(params.IMAGE)
-       - name: IMAGE_PUSH_SECRETS
-         value: dockerhub-secret
-       - name: TLSVERIFY
-         value: $(params.TLSVERIFY)
-       - name: DOCKERFILE
-         value: my-flask-app/Dockerfile  # Path to your Dockerfile
-       - name: CONTEXT
-         value: my-flask-app  # Path to your context directory
 
 
-     workspaces:
-       - name: source
-         workspace: shared-data
 
-     #  - name: dockerconfig
-     #    workspace: dockerconfig-ws
 
+
+    - name: list-repo-contents
+      taskRef:
+        name: list-repo-contents
+      runAfter:
+        - fetch-repo
+      workspaces:
+        - name: source
+          workspace: shared-data
+
+
+
+
+    - name: build
+      taskRef:
+        name: buildah
+      runAfter:
+        - tests
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+        - name: IMAGE_PUSH_SECRETS
+          value: dockerhub-secret
+        - name: TLSVERIFY
+          value: $(params.TLSVERIFY)
+        - name: DOCKERFILE
+          value: my-flask-app/Dockerfile  # Path to your Dockerfile
+        - name: CONTEXT
+          value: my-flask-app  # Path to your context directory
+      workspaces:
+        - name: source
+          workspace: shared-data

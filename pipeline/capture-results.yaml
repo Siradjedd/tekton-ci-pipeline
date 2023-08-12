@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: python-script
+spec:
+  params:
+    - name: pytestOutput
+  steps:
+    - name: python-script
+      image: python:3.11.1-bullseye
+      script: |
+        # Python script to extract relevant information from pytest output
+        import re
+
+        # Extract number of passed tests
+        passed_tests_match = re.search(r"(\d+) passed", "$(params.pytestOutput)")
+        passed_tests = passed_tests_match.group(1) if passed_tests_match else "0"
+
+        # Extract total execution time
+        execution_time_match = re.search(r"(\d+\.\d+)s", "$(params.pytestOutput)")
+        execution_time = execution_time_match.group(1) if execution_time_match else "0.00"
+
+        print(f"Passed tests: {passed_tests}, Execution time: {execution_time} seconds")
+      env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
