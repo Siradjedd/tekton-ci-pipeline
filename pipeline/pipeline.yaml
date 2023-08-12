@@ -77,7 +77,7 @@ spec:
      taskRef:
        name: buildah
      runAfter:
-       - fetch-repo
+       - tests
      params:
        - name: IMAGE
          value: $(params.IMAGE)
