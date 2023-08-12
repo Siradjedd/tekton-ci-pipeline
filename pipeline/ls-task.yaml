@@ -13,4 +13,4 @@ spec:
   volumes:
     - name: shared-data
       persistentVolumeClaim:
-        claimName: pvc-16a19317-09b7-4665-a1c0-5757a86e5873
+        claimName: pvc-d314e983ac

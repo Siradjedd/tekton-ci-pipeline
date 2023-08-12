@@ -18,6 +18,14 @@ spec:
    - name: TLSVERIFY
      description: to activate the tls handshake
 
+   - name: SOURCE_PATH
+     description: tests path 
+
+   - name: DOCKERFILE
+     description: Path to the docker file
+
+   - name: CONTEXT
+     description:  Path to the directory to use as context 
 
  workspaces:
    - name: shared-data
@@ -44,6 +52,20 @@ spec:
          value: $(params.branch-name)
        - name: deleteExisting
          value: "true"
+      
+   - name: tests
+     taskRef:
+        name: pytest
+     runAfter:
+       - fetch-repo
+     workspaces:
+       - name: source
+         workspace: shared-data
+
+     params:
+       - name: SOURCE_PATH
+         value: "$(params.SOURCE_PATH)"
+
 
    - name: list-repo-contents
      taskRef:
@@ -67,6 +89,10 @@ spec:
          value: dockerhub-secret
        - name: TLSVERIFY
          value: $(params.TLSVERIFY)
+       - name: DOCKERFILE
+         value: $(params.DOCKERFILE)
+       - name: CONTEXT
+         value: $(params.CONTEXT)
 
 
      workspaces:
