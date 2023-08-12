@@ -8,3 +8,4 @@ packaging
 pyparsing
 six
 Werkzeug
+prometheus_client
